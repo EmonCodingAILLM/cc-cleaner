@@ -176,21 +176,22 @@ def generate_preview_text(project):
     res = project['resources']
 
     status_char = '\033[32m●\033[0m' if project['exists'] else '\033[90m○\033[0m'
-    status_text = '存在' if project['exists'] else '已删除'
-    wh_text = ' \033[31m[白名单]\033[0m' if project['whitelisted'] else ''
+    status_text = 'exists' if project['exists'] else 'deleted'
+    wh_text = ' \033[31m[WHITELIST]\033[0m' if project['whitelisted'] else ''
     basename = os.path.basename(project['path'])
 
     lines = [
-        f"  {basename}",
-        f"  {project['path']}",
-        f"  {status_char} {status_text}{wh_text}",
+        f"  Name:       {basename}",
+        f"  Path:       {project['path']}",
+        f"  Status:     {status_char} {status_text}{wh_text}",
+        f"  Sessions:   {project['session_count']:>4d}",
         "",
-        f"  会话           {project['session_count']:>4} 个      {res['project_mb']:>8.2f} MB",
-        f"  文件历史                {res['file_history_mb']:>8.2f} MB",
-        f"  会话环境                {res['session_env_mb']:>8.2f} MB",
-        f"  任务数据                {res['tasks_mb']:>8.2f} MB",
+        f"  File History:     {res['file_history_mb']:>8.2f} MB",
+        f"  Session Env:      {res['session_env_mb']:>8.2f} MB",
+        f"  Task Data:        {res['tasks_mb']:>8.2f} MB",
+        f"  Session Data:     {res['project_mb']:>8.2f} MB",
         f"  ─────────────────────────────────",
-        f"  合计                    {project['total_size_mb']:>8.2f} MB",
+        f"  Total:            {project['total_size_mb']:>8.2f} MB",
     ]
 
     return '\n'.join(lines)
