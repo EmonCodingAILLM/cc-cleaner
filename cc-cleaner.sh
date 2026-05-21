@@ -83,7 +83,7 @@ for p in data['projects']:
 }
 
 main_interface() {
-    local header="Tab:多选 | Enter:操作菜单 | ?:帮助 | Esc:退出"
+    local header=" Esc 退出 | Tab 多选 | Enter 操作菜单 | ? 帮助 "
     local fzf_input
     fzf_input=$(generate_fzf_input)
 
@@ -99,7 +99,9 @@ main_interface() {
         --with-nth=1..4 \
         --nth=1 \
         --preview="cat $PREVIEW_DIR/{5}.txt 2>/dev/null || echo 'Loading...'" \
-        --preview-window="right:50%:wrap:border-left" \
+        --preview-window="right:35%:wrap:border-left" \
+        --preview-label=" Project Detail " \
+        --border \
         --bind="?:execute($SCRIPT_DIR/cc-cleaner.sh help)+clear-query" \
         --header="$header" \
         --header-first \
