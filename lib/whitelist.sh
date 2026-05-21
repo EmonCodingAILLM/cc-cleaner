@@ -104,14 +104,19 @@ whitelist_delete() {
         return
     fi
 
-    while IFS= read -r pattern; do
-        [ -z "$pattern" ] && continue
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "/^${pattern//\//\\/}$/d" "$WHITELIST_FILE"
-        else
-            sed -i "/^${pattern//\//\\/}$/d" "$WHITELIST_FILE"
-        fi
-    done <<< "$selected"
+    # Use Python with temp file for safe exact-line removal
+    local tmp_rm
+    tmp_rm=$(mktemp /tmp/cc-cleaner-wlremove.XXXXXX)
+    echo "$selected" > "$tmp_rm"
+    python3 -c "
+with open('$tmp_rm') as rf:
+    target_lines = set(line.strip() for line in rf if line.strip())
+with open('$WHITELIST_FILE') as f:
+    kept = [line for line in f if line.rstrip('\n') not in target_lines]
+with open('$WHITELIST_FILE', 'w') as f:
+    f.writelines(kept)
+"
+    rm -f "$tmp_rm"
 
     echo "  Removed."
 }

@@ -204,9 +204,19 @@ for p in data['plans']:
     if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
         local deleted=0
         while IFS= read -r line; do
-            local fname
+            local fname fpath
             fname=$(echo "$line" | cut -d'│' -f1 | xargs)
-            rm -f "$HOME/.claude/plans/$fname" && deleted=$((deleted + 1))
+            # Safety: reject names with path traversal or shell metacharacters
+            if [[ "$fname" =~ [/.:*?\[\]] ]]; then
+                echo "    Skipped unsafe filename: $fname"
+                continue
+            fi
+            fpath="$HOME/.claude/plans/$fname"
+            if [ ! -f "$fpath" ]; then
+                echo "    Not found: $fpath"
+                continue
+            fi
+            rm -f "$fpath" && deleted=$((deleted + 1))
         done <<< "$selected"
         echo "  Deleted $deleted plan(s)."
         run_scanner
@@ -435,18 +445,20 @@ main() {
             break
         fi
 
-        # Check if first project is whitelisted
-        local first_id is_wh
-        first_id=$(head -1 "$IDS_FILE")
+        # Check if ANY selected project is whitelisted
+        local is_wh
         is_wh=$(python3 -c "
 import json
 with open('$DATA_FILE') as f:
     data = json.load(f)
+with open('$IDS_FILE') as f:
+    ids = set(line.strip() for line in f if line.strip())
 for p in data['projects']:
-    if p['id'] == '$first_id':
-        print('true' if p['whitelisted'] else 'false')
+    if p['id'] in ids and p['whitelisted']:
+        print('true')
         break
 " 2>/dev/null)
+        is_wh="${is_wh:-false}"
 
         # Operation menu
         local action
