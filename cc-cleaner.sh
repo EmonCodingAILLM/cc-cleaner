@@ -94,6 +94,7 @@ main_interface() {
         --multi \
         --ansi \
         --delimiter=' │ ' \
+        --with-nth=5 \
         --nth=5 \
         --preview="cat $PREVIEW_DIR/{1}.txt 2>/dev/null || echo 'Loading...'" \
         --preview-window="right:50%:wrap" \
