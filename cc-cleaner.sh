@@ -96,7 +96,7 @@ main_interface() {
         exit 0
     fi
 
-    fzf \
+    printf '%s\n' "$fzf_input" | fzf \
         --multi \
         --ansi \
         --delimiter='\t' \
