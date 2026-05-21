@@ -100,12 +100,12 @@ main_interface() {
         --multi \
         --ansi \
         --delimiter='\t' \
-        --with-nth=1,2,3,4 \
+        --with-nth=1 \
         --nth=1 \
         --preview="cat $PREVIEW_DIR/{5}.txt 2>/dev/null || echo 'Loading...'" \
-        --preview-window="right:35%:wrap:border-left" \
+        --preview-window="right:40%:sharp" \
         --preview-label=" Project Detail " \
-        --border \
+        --border=sharp \
         --bind="?:execute($SCRIPT_DIR/cc-cleaner.sh help)+clear-query" \
         --header="$header" \
         --header-first \
