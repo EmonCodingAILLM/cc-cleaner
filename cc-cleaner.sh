@@ -82,7 +82,7 @@ for p in data['projects']:
     wh = ' \033[31mW\033[0m' if p['whitelisted'] else ''
     basename = os.path.basename(p['path'])
     display = f'{basename} ({p[\"path\"]})'
-    print(f'{display} │ {scount:3d}s │ {size:7.1f}M │ {status}{wh} │ {sid}')
+    print(f'{display}\t{scount:3d}s\t{size:7.1f}M\t{status}{wh}\t{sid}')
 " 2>/dev/null
 }
 
@@ -99,8 +99,8 @@ main_interface() {
     fzf \
         --multi \
         --ansi \
-        --delimiter=' │ ' \
-        --with-nth=1..4 \
+        --delimiter='\t' \
+        --with-nth=1,2,3,4 \
         --nth=1 \
         --preview="cat $PREVIEW_DIR/{5}.txt 2>/dev/null || echo 'Loading...'" \
         --preview-window="right:35%:wrap:border-left" \
@@ -175,7 +175,7 @@ import json
 with open('$DATA_FILE') as f:
     data = json.load(f)
 for p in data['plans']:
-    print(f'{p[\"filename\"]} │ {p[\"size_kb\"]:6.1f} KB │ {p[\"mtime\"]}')
+    print(f'{p[\"filename\"]}\t{p[\"size_kb\"]:6.1f} KB\t{p[\"mtime\"]}')
 " 2>/dev/null)
 
     if [ -z "$plans_list" ]; then
@@ -189,7 +189,7 @@ for p in data['plans']:
     selected=$(echo "$plans_list" | fzf \
         --multi \
         --ansi \
-        --delimiter=' │ ' \
+        --delimiter='\t' \
         --nth=1 \
         --preview="cat $HOME/.claude/plans/{1} 2>/dev/null" \
         --preview-window="right:60%:wrap" \
@@ -204,7 +204,7 @@ for p in data['plans']:
     echo "  Will delete:"
     echo "$selected" | while IFS= read -r line; do
         local fname
-        fname=$(echo "$line" | cut -d'│' -f1 | xargs)
+        fname=$(echo "$line" | cut -d$'\t' -f1 | xargs)
         printf "    %s\n" "$HOME/.claude/plans/$fname"
     done
     echo ""
@@ -215,7 +215,7 @@ for p in data['plans']:
         local deleted=0
         while IFS= read -r line; do
             local fname fpath
-            fname=$(echo "$line" | cut -d'│' -f1 | xargs)
+            fname=$(echo "$line" | cut -d$'\t' -f1 | xargs)
             # Safety: reject names with path traversal or shell metacharacters
             if [[ "$fname" =~ [/.:*?\[\]] ]]; then
                 echo "    Skipped unsafe filename: $fname"
@@ -452,7 +452,7 @@ main() {
         fi
 
         # Extract project IDs (column 5) and write to temp file
-        echo "$selected" | cut -d'│' -f5 | xargs -n1 | grep -v '^$' > "$IDS_FILE"
+        echo "$selected" | cut -d$'\t' -f5 | xargs -n1 | grep -v '^$' > "$IDS_FILE"
         local proj_count
         proj_count=$(wc -l < "$IDS_FILE" | xargs)
 
