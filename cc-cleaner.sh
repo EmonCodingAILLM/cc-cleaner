@@ -60,7 +60,11 @@ EOF
 
 run_scanner() {
     cd "$SCRIPT_DIR"
-    python3 lib/scanner.py > /dev/null 2>&1
+    python3 lib/scanner.py > /dev/null 2>&1 || {
+        echo "ERROR: scanner failed. Running with output:"
+        cd "$SCRIPT_DIR" && python3 lib/scanner.py
+        exit 1
+    }
 }
 
 # ── Main fzf list ─────────────────────────────────────────────────
@@ -432,6 +436,11 @@ main() {
 
     # Run scanner
     run_scanner
+
+    local proj_total
+    proj_total=$(python3 -c "import json; d=json.load(open('$DATA_FILE')); print(len(d['projects']))" 2>/dev/null || echo "?")
+    echo "cc-cleaner: found $proj_total projects in ~/.claude/projects/"
+    echo ""
 
     # Main loop
     while true; do
