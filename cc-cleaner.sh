@@ -81,12 +81,13 @@ for p in data['projects']:
     status = '\033[32m●\033[0m' if p['exists'] else '\033[90m○\033[0m'
     wh = ' \033[31mW\033[0m' if p['whitelisted'] else ''
     basename = os.path.basename(p['path'])
-    path = p['path']
-    if len(path) > 50:
-        parts = path.split('/')
-        path = '/'.join(parts[:2]) + '/.../' + '/'.join(parts[-2:])
-    dim_path = f'\033[90m{path}\033[0m'
-    line = f'{basename:<28s} {dim_path:<55s} {scount:>4d}s {size:>7.1f}M {status}{wh}'
+    path_raw = p['path']
+    if len(path_raw) > 50:
+        parts = path_raw.split('/')
+        path_raw = '/'.join(parts[:2]) + '/.../' + '/'.join(parts[-2:])
+    # Pad the raw text first, then wrap with ANSI color (so padding width is correct)
+    dim_path = f'\033[90m{path_raw:<55s}\033[0m'
+    line = f'{basename:<28s} {dim_path} {scount:>4d}s {size:>7.1f}M {status}{wh}'
     print(f'{line}\t{sid}')
 " 2>/dev/null
 }
@@ -107,12 +108,13 @@ main_interface() {
         --delimiter='\t' \
         --with-nth=1 \
         --nth=1 \
+        --pointer='▌' \
+        --marker='✓' \
         --preview="cat $PREVIEW_DIR/{2}.txt 2>/dev/null || echo 'Loading...'" \
         --preview-window="right:40%:sharp" \
         --preview-label=" Project Detail " \
         --border=sharp \
-        --bind="space:toggle+down" \
-        --bind="?:execute($SCRIPT_DIR/cc-cleaner.sh help)+clear-query" \
+        --bind="space:toggle+down,?:execute($SCRIPT_DIR/cc-cleaner.sh help)+clear-query" \
         --header="$header" \
         --header-first \
         --prompt="Projects > "
