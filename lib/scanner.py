@@ -172,29 +172,25 @@ def scan_plans():
 
 def generate_preview_text(project):
     """Generate preview text for a single project."""
+    import os
     res = project['resources']
 
     status_char = '\033[32m●\033[0m' if project['exists'] else '\033[90m○\033[0m'
     status_text = '存在' if project['exists'] else '已删除'
-    wh_text = '\033[31m[白名单]\033[0m' if project['whitelisted'] else ''
+    wh_text = ' \033[31m[白名单]\033[0m' if project['whitelisted'] else ''
+    basename = os.path.basename(project['path'])
 
     lines = [
-        f"  项目: {project['path']}",
-        f"  状态: {status_char} {status_text} {wh_text}",
+        f"  {basename}",
+        f"  {project['path']}",
+        f"  {status_char} {status_text}{wh_text}",
         "",
-        f"  ── 会话 ─────────────────────────",
-        f"  数量:     {project['session_count']} 个",
-        f"  总大小:   {res['project_mb']} MB",
-        "",
-        f"  ── 文件编辑历史 ─────────────────",
-        f"  占用:     {res['file_history_mb']} MB",
-        "",
-        f"  ── 其他资源 ─────────────────────",
-        f"  会话环境: {res['session_env_mb']} MB",
-        f"  任务数据: {res['tasks_mb']} MB",
-        "",
-        f"  ── 合计 ─────────────────────────",
-        f"  总占用:   ~{project['total_size_mb']} MB",
+        f"  会话           {project['session_count']:>4} 个      {res['project_mb']:>8.2f} MB",
+        f"  文件历史                {res['file_history_mb']:>8.2f} MB",
+        f"  会话环境                {res['session_env_mb']:>8.2f} MB",
+        f"  任务数据                {res['tasks_mb']:>8.2f} MB",
+        f"  ─────────────────────────────────",
+        f"  合计                    {project['total_size_mb']:>8.2f} MB",
     ]
 
     return '\n'.join(lines)

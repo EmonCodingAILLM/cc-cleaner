@@ -67,7 +67,7 @@ run_scanner() {
 
 generate_fzf_input() {
     python3 -c "
-import json
+import json, os
 with open('$DATA_FILE') as f:
     data = json.load(f)
 for p in data['projects']:
@@ -76,7 +76,9 @@ for p in data['projects']:
     size = p['total_size_mb']
     status = '\033[32m●\033[0m' if p['exists'] else '\033[90m○\033[0m'
     wh = ' \033[31mW\033[0m' if p['whitelisted'] else ''
-    print(f'{sid} │ {scount:3d} sessions │ {size:7.1f} MB │ {status}{wh} │ {p[\"path\"]}')
+    basename = os.path.basename(p['path'])
+    display = f'{basename} ({p[\"path\"]})'
+    print(f'{display} │ {scount:3d}s │ {size:7.1f}M │ {status}{wh} │ {sid}')
 " 2>/dev/null
 }
 
@@ -94,12 +96,13 @@ main_interface() {
         --multi \
         --ansi \
         --delimiter=' │ ' \
-        --with-nth=5 \
-        --nth=5 \
-        --preview="cat $PREVIEW_DIR/{1}.txt 2>/dev/null || echo 'Loading...'" \
-        --preview-window="right:50%:wrap" \
+        --with-nth=1..4 \
+        --nth=1 \
+        --preview="cat $PREVIEW_DIR/{5}.txt 2>/dev/null || echo 'Loading...'" \
+        --preview-window="right:50%:wrap:border-left" \
         --bind="?:execute($SCRIPT_DIR/cc-cleaner.sh help)+clear-query" \
         --header="$header" \
+        --header-first \
         --prompt="Projects > "
 }
 
@@ -437,8 +440,8 @@ main() {
             break
         fi
 
-        # Extract project IDs and write to temp file
-        echo "$selected" | cut -d'│' -f1 | xargs -n1 | grep -v '^$' > "$IDS_FILE"
+        # Extract project IDs (column 5) and write to temp file
+        echo "$selected" | cut -d'│' -f5 | xargs -n1 | grep -v '^$' > "$IDS_FILE"
         local proj_count
         proj_count=$(wc -l < "$IDS_FILE" | xargs)
 

@@ -14,7 +14,6 @@ whitelist_init_default() {
 # One path per line. Supports ~ expansion and prefix matching.
 # Lines starting with # are ignored.
 #
-/Users
 /etc
 /usr
 /bin
