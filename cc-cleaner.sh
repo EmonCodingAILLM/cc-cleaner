@@ -81,8 +81,8 @@ for p in data['projects']:
     status = '\033[32m●\033[0m' if p['exists'] else '\033[90m○\033[0m'
     wh = ' \033[31mW\033[0m' if p['whitelisted'] else ''
     basename = os.path.basename(p['path'])
-    display = f'{basename} ({p[\"path\"]})'
-    print(f'{display}\t{scount:3d}s\t{size:7.1f}M\t{status}{wh}\t{sid}')
+    dim_path = f'\033[90m{p[\"path\"]}\033[0m'
+    print(f'{basename}\t{dim_path}\t{scount:3d}s\t{size:7.1f}M\t{status}{wh}\t{sid}')
 " 2>/dev/null
 }
 
@@ -100,9 +100,9 @@ main_interface() {
         --multi \
         --ansi \
         --delimiter='\t' \
-        --with-nth=1 \
+        --with-nth=1,2 \
         --nth=1 \
-        --preview="cat $PREVIEW_DIR/{5}.txt 2>/dev/null || echo 'Loading...'" \
+        --preview="cat $PREVIEW_DIR/{6}.txt 2>/dev/null || echo 'Loading...'" \
         --preview-window="right:40%:sharp" \
         --preview-label=" Project Detail " \
         --border=sharp \
@@ -452,7 +452,7 @@ main() {
         fi
 
         # Extract project IDs (column 5) and write to temp file
-        echo "$selected" | cut -d$'\t' -f5 | xargs -n1 | grep -v '^$' > "$IDS_FILE"
+        echo "$selected" | cut -d$'\t' -f6 | xargs -n1 | grep -v '^$' > "$IDS_FILE"
         local proj_count
         proj_count=$(wc -l < "$IDS_FILE" | xargs)
 
